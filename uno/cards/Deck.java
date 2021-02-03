@@ -15,4 +15,12 @@ public class Deck {
             }
         }
     }
+
+    @Override
+    public String toString() {
+        StringBuilder stringified = new StringBuilder();
+        for(int i = 0; i < deck.size(); i++)
+            String.format("%-3d| %c : %10s\n", i, deck.get(i).getColor(), deck.get(i).getValue());
+        return stringified.toString();
+    }
 }
