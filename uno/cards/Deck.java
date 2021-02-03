@@ -1,9 +1,13 @@
 package uno.cards;
 
+import java.util.Stack;
+import java.util.Collections;
+
 public class Deck {
-    ArrayList<Card> deck = new ArrayList<Card>();
+    private final Stack<Card> deck;
 
     public Deck() {
+        deck = new Stack<Card>();
         /*
          * 4 = number of colors in uno deck
          */
@@ -13,33 +17,45 @@ public class Deck {
         for(int i = 0; i < colors.length; i++) {
             for(int j = 0; j < 10; j++)
             {
-                deck.add(new Card(colors[i], (j+1)+""));
+                deck.add(new Card(colors[i], (j)+""));
             }
             for(int j = 1; j < 10; j++) {
-                deck.add(new Card(colors[i], "" + (j + 1)));
+                deck.add(new Card(colors[i], "" + (j)));
             }
             for(int j = 0; j < 2; j++)
             {
                 deck.add(new Card(colors[i], "rev"));
                 deck.add(new Card(colors[i], "skp"));
-                deck.add(new Card(colors[i], "drw+2"))
+                deck.add(new Card(colors[i], "drw+2"));
             }
         }
         // add the 8 wild cards
         for(int i = 0; i < 4; i++)
         {
             deck.add(new Card('w', "drw+4"));
-            deck.add(new Card('w', "wld"));
+            deck.add(new Card('w', "drw+0"));
         }
 
         
+    }
+
+    public Card draw() {
+        return deck.pop();
+    }
+
+    public void shuffle() {
+        Collections.shuffle(deck);
+    }
+
+    public Stack<Card> getDeck() {
+        return deck;
     }
 
     @Override
     public String toString() {
         StringBuilder stringified = new StringBuilder();
         for(int i = 0; i < deck.size(); i++)
-            String.format("%-3d| %c : %10s\n", i, deck.get(i).getColor(), deck.get(i).getValue());
+            stringified.append(String.format("%-3d| %c : %5s\n", i + 1, deck.get(i).getColor(), deck.get(i).getValue()));
         return stringified.toString();
     }
 }
