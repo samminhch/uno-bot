@@ -10,6 +10,12 @@ public class Card {
 
     /**
      * @return <code>String</code> 
+     * color key:
+     * r = red
+     * g = green
+     * b = blue
+     * y = yellow
+     * w = wild color
      */
     public char getColor() {
         return color;
