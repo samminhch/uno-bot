@@ -4,24 +4,22 @@ import java.util.Stack;
 import java.util.Collections;
 
 public class Deck {
-    private final Stack<Card> deck;
+    private Stack<Card> deck;
 
     public Deck() {
         deck = new Stack<Card>();
         /*
          * 4 = number of colors in uno deck
          */
-        int index = 0;
         char[] colors = {'r', 'g', 'b', 'y'};
         // add the first 100 cards, r g b & y
         for(int i = 0; i < colors.length; i++) {
             for(int j = 0; j < 10; j++)
-            {
                 deck.add(new Card(colors[i], (j)+""));
-            }
-            for(int j = 1; j < 10; j++) {
+
+            for(int j = 1; j < 10; j++)
                 deck.add(new Card(colors[i], "" + (j)));
-            }
+
             for(int j = 0; j < 2; j++)
             {
                 deck.add(new Card(colors[i], "rev"));
@@ -35,10 +33,11 @@ public class Deck {
             deck.add(new Card('w', "drw+4"));
             deck.add(new Card('w', "drw+0"));
         }
-
-        
     }
 
+    public void set(Stack<Card> deckCards) {
+        deck = deckCards;
+    }
     public Card draw() {
         return deck.pop();
     }
