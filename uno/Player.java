@@ -15,6 +15,10 @@ public class Player {
         return hand;
     }
 
+    public int numCardsInHand() {
+        return hand.size();
+    }
+
     public void addCard(Card card) {
         hand.add(card);
     }
