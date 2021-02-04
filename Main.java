@@ -3,6 +3,10 @@ import uno.cards.*;
 
 import java.util.*;
 
+/**
+ * This class is used in order to run the Uno game.
+ * #TODO: integrate machine learning into the main method.
+ */
 public class Main
 {
     static Deck deck;
@@ -39,6 +43,10 @@ public class Main
         }
     }
 
+    /**
+     * This method plays out a turn in the Uno game.
+     * @param turn the player that gets to play.
+     */
     public static void turn(int turn) {
         switch (turn) {
             case 0:
