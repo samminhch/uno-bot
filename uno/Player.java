@@ -26,4 +26,11 @@ public class Player {
     public void removeCard(Card card) {
         hand.remove(card);
     }
+
+    /**
+     * @return <code>String</code> of all the cards the player's hand.
+     */
+    public String toString() {
+        return hand.toString();
+    }
 }

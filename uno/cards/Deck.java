@@ -35,11 +35,12 @@ public class Deck {
         }
     }
 
-    public void set(Stack<Card> deckCards) {
-        deck = deckCards;
-    }
     public Card draw() {
         return deck.pop();
+    }
+
+    public void removeCard(Card card) {
+        deck.remove(card);
     }
 
     public void shuffle() {
@@ -48,6 +49,10 @@ public class Deck {
 
     public Stack<Card> getDeck() {
         return deck;
+    }
+
+    public int size() {
+        return deck.size();
     }
 
     @Override
