@@ -27,6 +27,10 @@ public class Player {
         hand.remove(card);
     }
 
+    public int size() {
+        return hand.size();
+    }
+
     /**
      * @return <code>String</code> of all the cards the player's hand.
      */
