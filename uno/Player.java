@@ -23,6 +23,10 @@ public class Player {
         hand.add(card);
     }
 
+    public void removeCard(int i) {
+        hand.remove(i);
+    }
+
     public void removeCard(Card card) {
         hand.remove(card);
     }

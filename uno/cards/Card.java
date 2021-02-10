@@ -3,6 +3,7 @@ package uno.cards;
 public class Card {
     private char color;
     private String value;
+    
     public Card(char clr, String val) {
         color = clr;
         value = val;
@@ -32,5 +33,9 @@ public class Card {
      */
     public String getValue() {
         return value;
+    }
+
+    public String toString() {
+        return color + " " + value;
     }
 }
