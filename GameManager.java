@@ -1,5 +1,4 @@
-import uno.*;
-import uno.cards.*;
+import com.marshie.uno.*;
 
 import java.util.*;
 
@@ -23,8 +22,8 @@ public class GameManager {
 
     public void startGame() {
         for (int i = 0; i < 7; i++)
-            for(int j = 0; j < players.length; j++)
-                playerDrawCard(players[j]);
+            for (Player player : players)
+                playerDrawCard(player);
         
         cardPlayed = deck.draw();    
     
@@ -35,7 +34,7 @@ public class GameManager {
         }
     }
 
-    public void turn() {
+    private void turn() {
         interpretCard();
         playCard(); //this method should be the method the AI uses to play a card.
         if (players[whosTurn].size() == 1)
@@ -61,7 +60,7 @@ public class GameManager {
 
 
     //I'm just going to add rules of what cards you aren't allowed to play.
-    public void playCard() {
+    private void playCard() {
         ArrayList<Card> playableCards  = new ArrayList<Card>();
 
         for (Card card : players[whosTurn].getHand())
@@ -84,7 +83,7 @@ public class GameManager {
      * This method draws a card from the deck to the player's hand.
      * @param player the Player that's drawing from the deck.
      */
-    public void playerDrawCard(Player player) {
+    private void playerDrawCard(Player player) {
         player.addCard(deck.draw());
     }
 
@@ -102,7 +101,7 @@ public class GameManager {
     /**
      * This method creates a new Uno deck, excluding cards in both player's hands.
      */
-    public void newDeck() {
+    private void newDeck() {
         deck = new Deck();
 
         //removes cards from the deck that's already in player's hand & in play

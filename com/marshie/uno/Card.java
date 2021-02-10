@@ -1,8 +1,8 @@
-package uno.cards;
+package com.marshie.uno;
 
 public class Card {
-    private char color;
-    private String value;
+    private final char color;
+    private final String value;
     public Card(char clr, String val) {
         color = clr;
         value = val;

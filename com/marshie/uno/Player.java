@@ -1,4 +1,4 @@
-package uno;
+package com.marshie.uno;
 
 import uno.cards.*;
 
