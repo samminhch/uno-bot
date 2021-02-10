@@ -93,7 +93,7 @@ public class GameManager {
                 response = in.nextLine();
                 if (response.equals("Y")) {
                     players[whosTurn].removeCard(nextCard);
-                    cardPlayed = wildCardCase(nextCard);
+                    cardPlayed = wildCardCase(nextCard); //wildCardCase just converts the wild card into a colored card
                 }
             }
         }
