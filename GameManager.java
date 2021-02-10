@@ -25,9 +25,8 @@ public class GameManager {
      */
     public void startGame() {
         for (int i = 0; i < 7; i++)
-            for (Player player : players)
-                playerDrawCard(player);
-        
+            for (int j = 0; j < players.length; j++)
+                players[j].addCard(deck.draw());
         cardPlayed = deck.draw();    
     
         while (!isFinished()) {
@@ -37,7 +36,10 @@ public class GameManager {
         }
     }
 
-    private void turn() {
+    /**
+     * This method plays a turn out in the Uno game.
+     */
+    public void turn() {
         interpretCard();
         playCard(); //this method should be the method the AI uses to play a card.
         
@@ -58,37 +60,77 @@ public class GameManager {
             int numDraws = Integer.parseInt(cardValue.substring(cardValue.indexOf("+") + 1));
 
             for(int i = 0; i < numDraws; i++)
-                playerDrawCard(players[wrap(whosTurn)]);
+                players[whosTurn].addCard(deck.draw());
         }
     }
 
-    //I'm just going to add rules of what cards you aren't allowed to play.
     private void playCard() {
-        ArrayList<Card> playableCards  = new ArrayList<Card>();
+        Scanner in = new Scanner(System.in);
+        ArrayList<Card> playableCards = new ArrayList<Card>();
+        ArrayList<Card> curPlayerHand = players[whosTurn].getHand();
 
-        for (Card card : players[whosTurn].getHand())
+
+        for (Card card : curPlayerHand)
             if (card.getColor() == cardPlayed.getColor() || card.getValue().equals(cardPlayed.getValue()))
                 playableCards.add(card);
-
-        //if there's no playable cards in hand, player will draw from deck until there's a card for the player to play.
-        while (playableCards.size() == 0){
-            Card nextCard = deck.draw();
-            players[whosTurn].addCard(nextCard);
-            if (nextCard.getColor() == cardPlayed.getColor() || nextCard.getValue().equals(cardPlayed.getValue()))
-                playableCards.add(nextCard);
+        
+        //will automatically draw cards if you don't have any playable cards, and if you do, it'll print out the cards
+        //that are playable and will ask you if you want to play a card or draw a card.
+        if (playableCards.size() == 0){
+            String response = "";
+            while(response.equals("N")) {
+                //if there's no playable cards in hand, player will draw from deck until there's a card for the player to play.
+                Card nextCard = deck.draw();
+                while (playableCards.size() == 0){
+                    players[whosTurn].addCard(nextCard);
+                    if (nextCard.getColor() == cardPlayed.getColor() || nextCard.getValue().equals(cardPlayed.getValue()))
+                        playableCards.add(nextCard);
+                    else
+                        nextCard = deck.draw();
+                }
+                System.out.printf("Play card %s? Y/N?\n", nextCard.toString());
+                response = in.nextLine();
+                if (response.equals("Y")) {
+                    players[whosTurn].removeCard(nextCard);
+                    cardPlayed = wildCardCase(nextCard); //wildCardCase just converts the wild card into a colored card
+                }
+            }
         }
-        //since the AI isn't implemented yet, I'm just gonna make the program choose a random card.
-        //please reimplement this later i just don't know what to do
-        cardPlayed = playableCards.get((int)(Math.random() * playableCards.size()));
+        else{
+            System.out.println(cardPlayed);
+            System.out.print("HAND: ");
+            for (int i = 0; i < curPlayerHand.size(); i++)
+                System.out.printf("(%d) %s, ", i + 1, curPlayerHand.get(i).toString());
+            System.out.println();
 
+            boolean validResponse = false;
+            while (!validResponse) {
+                System.out.println("Pick a card to play, or enter DRAW to draw:");
+                String response = in.nextLine();
+                if (response.equals("DRAW")){
+                    players[whosTurn].addCard(deck.draw());
+                    validResponse = true;
+                }
+                else if (response.matches("\\d+")) {
+                    int index = Integer.parseInt(response);
+                    if (index >= 0 && index < playableCards.size()) {                        
+                        players[whosTurn].removeCard(playableCards.get(index));
+                        cardPlayed = wildCardCase(playableCards.get(index));
+                    }
+                }
+            }           
+        }
+        in.close();
     }
 
-    /**
-     * This method draws a card from the deck to the player's hand.
-     * @param player the Player that's drawing from the deck.
-     */
-    private void playerDrawCard(Player player) {
-        player.addCard(deck.draw());
+    private Card wildCardCase(Card wild){
+        if (wild.getColor() != 'w')
+            return wild;
+        Scanner in = new Scanner(System.in);
+        System.out.println("Choose a color for the wild card: 'r' for Red, 'g' for Green, 'b' for Blue, 'y' for Yellow");
+        char color = in.nextLine().charAt(0);
+        in.close();
+        return new Card(color, wild.getValue());
     }
 
     private void prepare(int numPlayers) {
@@ -125,11 +167,7 @@ public class GameManager {
     }
 
     private int wrap(int index) {
-        if (index >= players.length)
-            index %= players.length;
-        else if (index < 0)
-            index += players.length + index;
-        return index;
+        return (index + players.length * 69) % players.length; // funny number ahaha 
     }
 
     private int nextTurn() {
