@@ -1,10 +1,10 @@
-package uno.cards;
+package com.marshie.uno;
 
 import java.util.Stack;
 import java.util.Collections;
 
 public class Deck {
-    private Stack<Card> deck;
+    private final Stack<Card> deck;
 
     public Deck() {
         deck = new Stack<Card>();
@@ -13,18 +13,17 @@ public class Deck {
          */
         char[] colors = {'r', 'g', 'b', 'y'};
         // add the first 100 cards, r g b & y
-        for(int i = 0; i < colors.length; i++) {
-            for(int j = 0; j < 10; j++)
-                deck.add(new Card(colors[i], (j)+""));
+        for (char color : colors) {
+            for (int j = 0; j < 10; j++)
+                deck.add(new Card(color, (j) + ""));
 
-            for(int j = 1; j < 10; j++)
-                deck.add(new Card(colors[i], "" + (j)));
+            for (int j = 1; j < 10; j++)
+                deck.add(new Card(color, "" + (j)));
 
-            for(int j = 0; j < 2; j++)
-            {
-                deck.add(new Card(colors[i], "rev"));
-                deck.add(new Card(colors[i], "skp"));
-                deck.add(new Card(colors[i], "drw+2"));
+            for (int j = 0; j < 2; j++) {
+                deck.add(new Card(color, "rev"));
+                deck.add(new Card(color, "skp"));
+                deck.add(new Card(color, "drw+2"));
             }
         }
         // add the 8 wild cards
@@ -45,10 +44,6 @@ public class Deck {
 
     public void shuffle() {
         Collections.shuffle(deck);
-    }
-
-    public Stack<Card> getDeck() {
-        return deck;
     }
 
     public int size() {
