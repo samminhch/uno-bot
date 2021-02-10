@@ -1,6 +1,6 @@
 package com.marshie.uno;
 
-public class Card {
+public class Card implements Comparable<Card> {
     private final char color;
     private final String value;
     public Card(char clr, String val) {
@@ -36,5 +36,19 @@ public class Card {
 
     public String toString() {
         return color + " " + value;
+    }
+
+    /**
+     * Compares colors first and then value second. Compared alphabetically??
+     * @param c the comparison card.
+     * @return <code>int</code>>
+     */
+    public int compareTo(Card c) {
+        if (color > c.getColor())
+            return 1;
+        if (color < c.getColor())
+            return -1;
+        else
+            return value.compareTo(c.getValue());
     }
 }

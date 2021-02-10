@@ -27,7 +27,7 @@ public class GameManager {
         for (int i = 0; i < 7; i++)
             for (int j = 0; j < players.length; j++)
                 players[j].addCard(deck.draw());
-        cardPlayed = deck.draw();    
+        cardPlayed = wildCardCase(deck.draw()); //in the case that a wild card is played first, the first player must choose a color.
     
         while (!isFinished()) {
             if (deck.size() == 0)
@@ -71,7 +71,7 @@ public class GameManager {
 
 
         for (Card card : curPlayerHand)
-            if (card.getColor() == cardPlayed.getColor() || card.getValue().equals(cardPlayed.getValue()))
+            if (card.getColor() == cardPlayed.getColor() || card.getColor() == 'w' || card.getValue().equals(cardPlayed.getValue()))
                 playableCards.add(card);
         
         //will automatically draw cards if you don't have any playable cards, and if you do, it'll print out the cards
@@ -97,11 +97,16 @@ public class GameManager {
             }
         }
         else{
-            System.out.println(cardPlayed);
-            System.out.print("HAND: ");
-            for (int i = 0; i < curPlayerHand.size(); i++)
-                System.out.printf("(%d) %s, ", i + 1, curPlayerHand.get(i).toString());
-            System.out.println();
+            //prints out player's hand and card at play
+            System.out.println("PLAYER " + (whosTurn + 1) + ":");
+            System.out.printf("Card at play: %s\n", cardPlayed);
+            System.out.print("PLAYABLE HAND: ");
+            Collections.sort(curPlayerHand);
+            Collections.sort(playableCards);
+            for (int i = 0; i < playableCards.size() - 1; i++)
+                System.out.printf("(%d) %s, ", i + 1, playableCards.get(i).toString());
+            System.out.printf("(%d) %s\n", playableCards.size(), playableCards.get(playableCards.size() - 1).toString());
+            System.out.printf("FULL HAND: %s\n", curPlayerHand.toString());
 
             boolean validResponse = false;
             while (!validResponse) {
@@ -112,10 +117,11 @@ public class GameManager {
                     validResponse = true;
                 }
                 else if (response.matches("\\d+")) {
-                    int index = Integer.parseInt(response);
+                    int index = Integer.parseInt(response) - 1;
                     if (index >= 0 && index < playableCards.size()) {                        
                         players[whosTurn].removeCard(playableCards.get(index));
                         cardPlayed = wildCardCase(playableCards.get(index));
+                        validResponse = true;
                     }
                 }
             }           
