@@ -1,7 +1,5 @@
 package com.marshie.uno;
 
-import uno.cards.*;
-
 import java.util.*;
 
 public class Player {
