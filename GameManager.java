@@ -20,6 +20,18 @@ public class GameManager {
         prepare(numPlayers);
     }
 
+    private void prepare(int numPlayers) {
+        players = new Player[numPlayers];
+        for (int i = 0; i < players.length; i++)
+            players[i] = new Player();
+
+        deck = new Deck();
+        deck.shuffle();
+
+        whosTurn = 0;
+        dirPos = true;
+    }
+
     /**
      * This will set up a new Uno game and play until the game is finished.
      */
@@ -37,20 +49,30 @@ public class GameManager {
     }
 
     /**
-     * This method plays a turn out in the Uno game.
+     * This method creates a new Uno deck, excluding cards in both player's hands.
      */
-    public void turn() {
-        interpretCard();
-        playCard(); //this method should be the method the AI uses to play a card.
-        
-        if (players[whosTurn].size() == 1)
-            System.out.printf("Player%d: Uno!", whosTurn + 1);
-        whosTurn = nextTurn();
+    private void newDeck() {
+        deck = new Deck();
+
+        //removes cards from the deck that's already in player's hand & in play
+        for (Player player : players)
+            for (Card card : player.getHand())
+                deck.removeCard(card);
+        deck.removeCard(cardPlayed);
+
+        deck.shuffle(); //shuffles deck again.
+    }
+
+    private boolean isFinished() {
+        for(Player player : players)
+            if (player.getHand().size() == 0)
+                return true;
+        return false;
     }
 
     private void interpretCard() {
         String cardValue = cardPlayed.getValue();
-         //#TODO: fix bug where if you play a reverse card and draw, it'll still be your turn!
+        //#TODO: fix bug where if you play a reverse card and draw, it'll still be your turn!
         if (cardValue.equals("rev")) {
             dirPos = !dirPos;
             whosTurn = nextTurn();
@@ -65,6 +87,18 @@ public class GameManager {
         }
     }
 
+    /**
+     * This method plays a turn out in the Uno game.
+     */
+    public void turn() {
+        interpretCard();
+        playCard(); //this method should be the method the AI uses to play a card.
+
+        if (players[whosTurn].size() == 1)
+            System.out.printf("Player%d: Uno!", whosTurn + 1);
+        whosTurn = nextTurn();
+    }
+
     private void playCard() {
         Scanner in = new Scanner(System.in);
         ArrayList<Card> playableCards = new ArrayList<Card>();
@@ -74,7 +108,7 @@ public class GameManager {
         for (Card card : curPlayerHand)
             if (card.getColor() == cardPlayed.getColor() || card.getColor() == 'w' || card.getValue().equals(cardPlayed.getValue()))
                 playableCards.add(card);
-        
+
         //will automatically draw cards if you don't have any playable cards, and if you do, it'll print out the cards
         //that are playable and will ask you if you want to play a card or draw a card.
         if (playableCards.size() == 0){
@@ -119,13 +153,13 @@ public class GameManager {
                 }
                 else if (response.matches("\\d+")) {
                     int index = Integer.parseInt(response) - 1;
-                    if (index >= 0 && index < playableCards.size()) {                        
+                    if (index >= 0 && index < playableCards.size()) {
                         players[whosTurn].removeCard(playableCards.get(index));
                         cardPlayed = wildCardCase(playableCards.get(index));
                         validResponse = true;
                     }
                 }
-            }           
+            }
         }
     }
 
@@ -139,45 +173,9 @@ public class GameManager {
         return new Card(color, wild.getValue());
     }
 
-    private void prepare(int numPlayers) {
-        players = new Player[numPlayers];
-        for (int i = 0; i < players.length; i++) {
-            players[i] = new Player();
-        }
-
-        deck = new Deck();
-        deck.shuffle();
-
-        whosTurn = 0;
-        dirPos = true;
-    }
-
-    /**
-     * This method creates a new Uno deck, excluding cards in both player's hands.
-     */
-    private void newDeck() {
-        deck = new Deck();
-
-        //removes cards from the deck that's already in player's hand & in play
-        for (Player player : players)
-            for (Card card : player.getHand())
-                deck.removeCard(card);
-        deck.removeCard(cardPlayed);
-
-        deck.shuffle(); //shuffles deck again.
-    }
-
-    private boolean isFinished() {
-        for(Player player : players)
-            if (player.getHand().size() == 0)
-                return true;
-        return false;
-    }
-
     private int nextTurn() {
         return (whosTurn + (dirPos ? 1 : -1) + players.length * 69) % players.length;
     }
-
 
     /*                                  MAIN METHOD FOR TESTING                                   */
 
