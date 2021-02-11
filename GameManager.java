@@ -1,5 +1,8 @@
 import com.marshie.uno.*;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
 public class GameManager {
@@ -35,7 +38,7 @@ public class GameManager {
     /**
      * This will set up a new Uno game and play until the game is finished.
      */
-    public void startGame() {
+    public void startGame() throws IOException {
         for (int i = 0; i < 7; i++)
             for (Player player : players)
                 player.addCard(deck.draw());
@@ -46,6 +49,13 @@ public class GameManager {
                 newDeck();
             turn();
         }
+    }
+
+    private boolean isFinished() {
+        for(Player player : players)
+            if (player.getHand().size() == 0)
+                return true;
+        return false;
     }
 
     /**
@@ -63,11 +73,18 @@ public class GameManager {
         deck.shuffle(); //shuffles deck again.
     }
 
-    private boolean isFinished() {
-        for(Player player : players)
-            if (player.getHand().size() == 0)
-                return true;
-        return false;
+
+
+    /**
+     * This method plays a turn out in the Uno game.
+     */
+    public void turn() throws IOException {
+        interpretCard();
+        playCard(); //this method should be the method the AI uses to play a card.
+
+        if (players[whosTurn].size() == 1)
+            System.out.printf("Player%d: Uno!\n", whosTurn + 1);
+        whosTurn = nextTurn();
     }
 
     private void interpretCard() {
@@ -79,7 +96,7 @@ public class GameManager {
         }
         else if (cardValue.equals("skp"))
             whosTurn = nextTurn();
-        else if (cardValue.matches("draw+\\d")) {
+        else if (cardValue.matches("drw\\+\\d")) {
             int numDraws = Integer.parseInt(cardValue.substring(cardValue.indexOf("+") + 1));
 
             for(int i = 0; i < numDraws; i++)
@@ -87,20 +104,8 @@ public class GameManager {
         }
     }
 
-    /**
-     * This method plays a turn out in the Uno game.
-     */
-    public void turn() {
-        interpretCard();
-        playCard(); //this method should be the method the AI uses to play a card.
-
-        if (players[whosTurn].size() == 1)
-            System.out.printf("Player%d: Uno!", whosTurn + 1);
-        whosTurn = nextTurn();
-    }
-
-    private void playCard() {
-        Scanner in = new Scanner(System.in);
+    private void playCard() throws IOException {
+        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         ArrayList<Card> playableCards = new ArrayList<Card>();
         ArrayList<Card> curPlayerHand = players[whosTurn].getHand();
 
@@ -111,9 +116,10 @@ public class GameManager {
 
         //will automatically draw cards if you don't have any playable cards, and if you do, it'll print out the cards
         //that are playable and will ask you if you want to play a card or draw a card.
+        //#TODO: make this if statement not break the game.
         if (playableCards.size() == 0){
-            String response = "";
-            while(response.equals("N")) {
+            String response = "N";
+            while(!response.equals("Y")) {
                 //if there's no playable cards in hand, player will draw from deck until there's a card for the player to play.
                 Card nextCard = deck.draw();
                 while (playableCards.size() == 0){
@@ -124,14 +130,14 @@ public class GameManager {
                         nextCard = deck.draw();
                 }
                 System.out.printf("Play card %s? Y/N?\n", nextCard.toString());
-                response = in.nextLine();
+                response = in.readLine().toUpperCase();
                 if (response.equals("Y")) {
                     players[whosTurn].removeCard(nextCard);
                     cardPlayed = wildCardCase(nextCard); //wildCardCase just converts the wild card into a colored card
                 }
             }
         }
-        else{
+        else {
             //prints out player's hand and card at play
             System.out.println("PLAYER " + (whosTurn + 1) + ":");
             System.out.printf("Card at play: %s\n", cardPlayed);
@@ -141,17 +147,16 @@ public class GameManager {
             for (int i = 0; i < playableCards.size() - 1; i++)
                 System.out.printf("(%d) %s, ", i + 1, playableCards.get(i).toString());
             System.out.printf("(%d) %s\n", playableCards.size(), playableCards.get(playableCards.size() - 1).toString());
-            System.out.printf("FULL HAND: %s\n", curPlayerHand.toString());
+            System.out.printf("FULL HAND: (%d cards) %s\n", curPlayerHand.size(), curPlayerHand.toString());
 
             boolean validResponse = false;
             while (!validResponse) {
                 System.out.println("Pick a card to play, or enter DRAW to draw:");
-                String response = in.nextLine();
-                if (response.equals("DRAW")){
+                String response = in.readLine().toUpperCase();
+                if (response.equals("DRAW")) { //draws a card from deck and ends turn
                     players[whosTurn].addCard(deck.draw());
                     validResponse = true;
-                }
-                else if (response.matches("\\d+")) {
+                } else if (response.matches("\\d+")) {
                     int index = Integer.parseInt(response) - 1;
                     if (index >= 0 && index < playableCards.size()) {
                         players[whosTurn].removeCard(playableCards.get(index));
@@ -179,7 +184,7 @@ public class GameManager {
 
     /*                                  MAIN METHOD FOR TESTING                                   */
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         GameManager game = new GameManager(2);
         game.startGame();
     }
