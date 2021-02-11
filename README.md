@@ -17,11 +17,12 @@ to know at that age.
 
 ## About Authors
 In this 2020-2021 School year, Logan and I are both high schoolers, with Logan being a senior and me a sophomore.
+
 ###Minh Nguyen
 I'm the owner of this repository, and the person that came up with the idea to code an AI to master Uno!™. I also coded
 the majority of the classes required for the code.
 ###Logan Simon
-He's cool.
+He's cool and a very good friend of mine.
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
