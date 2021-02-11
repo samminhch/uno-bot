@@ -1,6 +1,6 @@
 # neural-network-uno-bot
 This is a code demonstrating the power of artificial intelligence and how it mastered the art of Uno!™
-##Table of Contents
+## Table of Contents
 1. [To-Do List](#to-do-list)
 2. [About Code](#about-code)
 3. [About Authors](#about-authors)
