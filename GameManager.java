@@ -25,8 +25,8 @@ public class GameManager {
      */
     public void startGame() {
         for (int i = 0; i < 7; i++)
-            for (int j = 0; j < players.length; j++)
-                players[j].addCard(deck.draw());
+            for (Player player : players)
+                player.addCard(deck.draw());
         cardPlayed = wildCardCase(deck.draw()); //in the case that a wild card is played first, the first player must choose a color.
     
         while (!isFinished()) {
@@ -45,17 +45,18 @@ public class GameManager {
         
         if (players[whosTurn].size() == 1)
             System.out.printf("Player%d: Uno!", whosTurn + 1);
-        nextTurn();
+        whosTurn = nextTurn();
     }
 
     private void interpretCard() {
         String cardValue = cardPlayed.getValue();
+         //#TODO: fix bug where if you play a reverse card and draw, it'll still be your turn!
         if (cardValue.equals("rev")) {
             dirPos = !dirPos;
-            nextTurn();
+            whosTurn = nextTurn();
         }
         else if (cardValue.equals("skp"))
-            whosTurn = wrap(nextTurn());
+            whosTurn = nextTurn();
         else if (cardValue.matches("draw+\\d")) {
             int numDraws = Integer.parseInt(cardValue.substring(cardValue.indexOf("+") + 1));
 
@@ -126,7 +127,6 @@ public class GameManager {
                 }
             }           
         }
-        in.close();
     }
 
     private Card wildCardCase(Card wild){
@@ -141,7 +141,9 @@ public class GameManager {
 
     private void prepare(int numPlayers) {
         players = new Player[numPlayers];
-        Arrays.fill(players, new Player());
+        for (int i = 0; i < players.length; i++) {
+            players[i] = new Player();
+        }
 
         deck = new Deck();
         deck.shuffle();
@@ -172,11 +174,15 @@ public class GameManager {
         return false;
     }
 
-    private int wrap(int index) {
-        return (index + players.length * 69) % players.length; // funny number ahaha 
+    private int nextTurn() {
+        return (whosTurn + (dirPos ? 1 : -1) + players.length * 69) % players.length;
     }
 
-    private int nextTurn() {
-        return whosTurn += dirPos ? 1 : -1;
+
+    /*                                  MAIN METHOD FOR TESTING                                   */
+
+    public static void main(String[] args) {
+        GameManager game = new GameManager(2);
+        game.startGame();
     }
 }
