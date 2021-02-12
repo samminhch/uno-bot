@@ -45,8 +45,7 @@ public class GameManager {
         cardPlayed = wildCardCase(deck.draw()); //in the case that a wild card is played first, the first player must choose a color.
     
         while (!isFinished()) {
-            if (deck.size() == 0)
-                newDeck();
+            newDeck();
             turn();
         }
     }
@@ -62,15 +61,17 @@ public class GameManager {
      * This method creates a new Uno deck, excluding cards in both player's hands.
      */
     private void newDeck() {
-        deck = new Deck();
-
-        //removes cards from the deck that's already in player's hand & in play
-        for (Player player : players)
-            for (Card card : player.getHand())
-                deck.removeCard(card);
-        deck.removeCard(cardPlayed);
-
-        deck.shuffle(); //shuffles deck again.
+        if (deck.size() == 0) {
+            deck = new Deck();
+    
+            //removes cards from the deck that's already in player's hand & in play
+            for (Player player : players)
+                for (Card card : player.getHand())
+                    deck.removeCard(card);
+            deck.removeCard(cardPlayed);
+    
+            deck.shuffle(); //shuffles deck again.
+        }
     }
 
 
@@ -105,7 +106,7 @@ public class GameManager {
     }
 
     private void playCard() throws IOException {
-        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+        Scanner in = new Scanner(System.in);
         ArrayList<Card> playableCards = new ArrayList<Card>();
         ArrayList<Card> curPlayerHand = players[whosTurn].getHand();
 
@@ -114,12 +115,27 @@ public class GameManager {
             if (card.getColor() == cardPlayed.getColor() || card.getColor() == 'w' || card.getValue().equals(cardPlayed.getValue()))
                 playableCards.add(card);
 
+            //prints out player's hand and card at play
+            System.out.println("PLAYER " + (whosTurn + 1) + ":");
+            System.out.printf("Card at play: %s\n", cardPlayed);
+            System.out.print("PLAYABLE HAND: ");
+            Collections.sort(curPlayerHand);
+            Collections.sort(playableCards);
+            for (int i = 0; i < playableCards.size() - 1; i++)
+                System.out.printf("(%d) %s, ", i + 1, playableCards.get(i).toString());
+            if (playableCards.size() == 0)
+                System.out.println("null");
+            else
+                System.out.printf("(%d) %s\n", playableCards.size(), playableCards.get(playableCards.size() - 1).toString());
+            System.out.printf("FULL HAND: (%d cards) %s\n", curPlayerHand.size(), curPlayerHand.toString());
+
         //will automatically draw cards if you don't have any playable cards, and if you do, it'll print out the cards
         //that are playable and will ask you if you want to play a card or draw a card.
         //#TODO: make this if statement not break the game.
         if (playableCards.size() == 0){
             String response = "N";
-            while(!response.equals("Y")) {
+            while(response.equals("N")) {
+                newDeck(); //This is to make sure that the deck won't be empty while we're drawing more cards.
                 //if there's no playable cards in hand, player will draw from deck until there's a card for the player to play.
                 Card nextCard = deck.draw();
                 while (playableCards.size() == 0){
@@ -129,8 +145,14 @@ public class GameManager {
                     else
                         nextCard = deck.draw();
                 }
-                System.out.printf("Play card %s? Y/N?\n", nextCard.toString());
-                response = in.readLine().toUpperCase();
+
+                //This while-loop is introduced so that the only valid answers are "Y" and "N".
+                String ans = "";
+                while(!ans.matches("[YN]")){
+                    System.out.printf("Play card %s? Y/N?\n", nextCard.toString());
+                    ans = in.nextLine().toUpperCase();
+                }
+                response = ans;
                 if (response.equals("Y")) {
                     players[whosTurn].removeCard(nextCard);
                     cardPlayed = wildCardCase(nextCard); //wildCardCase just converts the wild card into a colored card
@@ -138,21 +160,10 @@ public class GameManager {
             }
         }
         else {
-            //prints out player's hand and card at play
-            System.out.println("PLAYER " + (whosTurn + 1) + ":");
-            System.out.printf("Card at play: %s\n", cardPlayed);
-            System.out.print("PLAYABLE HAND: ");
-            Collections.sort(curPlayerHand);
-            Collections.sort(playableCards);
-            for (int i = 0; i < playableCards.size() - 1; i++)
-                System.out.printf("(%d) %s, ", i + 1, playableCards.get(i).toString());
-            System.out.printf("(%d) %s\n", playableCards.size(), playableCards.get(playableCards.size() - 1).toString());
-            System.out.printf("FULL HAND: (%d cards) %s\n", curPlayerHand.size(), curPlayerHand.toString());
-
             boolean validResponse = false;
             while (!validResponse) {
                 System.out.println("Pick a card to play, or enter DRAW to draw:");
-                String response = in.readLine().toUpperCase();
+                String response = in.nextLine().toUpperCase();
                 if (response.equals("DRAW")) { //draws a card from deck and ends turn
                     players[whosTurn].addCard(deck.draw());
                     validResponse = true;
@@ -172,9 +183,11 @@ public class GameManager {
         if (wild.getColor() != 'w')
             return wild;
         Scanner in = new Scanner(System.in);
-        System.out.println("Choose a color for the wild card: 'r' for Red, 'g' for Green, 'b' for Blue, 'y' for Yellow");
-        char color = in.nextLine().charAt(0);
-        in.close();
+        char color = '\0'; //that character just stands for null
+        while(!Character.toString(color).matches("[rgby]")){
+            System.out.println("Choose a color for the wild card: 'r' for Red, 'g' for Green, 'b' for Blue, 'y' for Yellow");
+            color = in.nextLine().charAt(0);
+        }
         return new Card(color, wild.getValue());
     }
 
