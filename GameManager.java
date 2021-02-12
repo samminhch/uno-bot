@@ -1,8 +1,5 @@
 import com.marshie.uno.*;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.*;
 
 public class GameManager {
@@ -15,7 +12,7 @@ public class GameManager {
     /*
      * This class is used in order to run the Uno game.
      */
-    public GameManager(int numPlayers) throws IllegalArgumentException {
+    public GameManager(int numPlayers) {
         if (numPlayers < 2 || numPlayers >= 10)
             throw new IllegalArgumentException(String.format(
                     "The number of players needed for Uno is 2-10. The number of players you entered was %d.",
@@ -38,7 +35,7 @@ public class GameManager {
     /**
      * This will set up a new Uno game and play until the game is finished.
      */
-    public void startGame() throws IOException {
+    public void startGame() {
         for (int i = 0; i < 7; i++)
             for (Player player : players)
                 player.addCard(deck.draw());
@@ -79,7 +76,7 @@ public class GameManager {
     /**
      * This method plays a turn out in the Uno game.
      */
-    public void turn() throws IOException {
+    public void turn() {
         interpretCard();
         playCard(); //this method should be the method the AI uses to play a card.
 
@@ -105,7 +102,7 @@ public class GameManager {
         }
     }
 
-    private void playCard() throws IOException {
+    private void playCard() {
         Scanner in = new Scanner(System.in);
         ArrayList<Card> playableCards = new ArrayList<Card>();
         ArrayList<Card> curPlayerHand = players[whosTurn].getHand();
@@ -197,7 +194,7 @@ public class GameManager {
 
     /*                                  MAIN METHOD FOR TESTING                                   */
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         GameManager game = new GameManager(2);
         game.startGame();
     }
