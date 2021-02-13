@@ -8,6 +8,8 @@ This is a code demonstrating the power of artificial intelligence and how it mas
 
 ## To-Do List:
 - [ ] Fix bug where if a player uses a reverse card and then draws in a 2-player match, it'll be their turn again.
+- [ ] Fix bug where if a player uses a draw card and then draws again, they'll get 2 cards again.  
+- [x] Fix bug where if you don't have any playable cards and deny the first playable card drawn, it'll allow you to play any subsequently drawn card.  
 - [x] Fix bug where if you play a draw card the opponent doesn't actually draw cards.
 - [x] Fix bug where BufferedReader randomly crashes and breaks the game. ~~I still don't know how to fix that.~~ It was actually a scanner problem and I closed the scanner in the wild-card method.
 - [ ] FINISH THE REST OF THE DARN GAME

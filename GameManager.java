@@ -48,30 +48,13 @@ public class GameManager {
     }
 
     private boolean isFinished() {
-        for(Player player : players)
-            if (player.getHand().size() == 0)
+        for(int i = 0; i < players.length; i++)
+            if (players[i].getHand().size() == 0) {
+                System.out.printf("Player %d won!\n", i + 1);
                 return true;
+            }
         return false;
     }
-
-    /**
-     * This method creates a new Uno deck, excluding cards in both player's hands.
-     */
-    private void newDeck() {
-        if (deck.size() == 0) {
-            deck = new Deck();
-    
-            //removes cards from the deck that's already in player's hand & in play
-            for (Player player : players)
-                for (Card card : player.getHand())
-                    deck.removeCard(card);
-            deck.removeCard(cardPlayed);
-    
-            deck.shuffle(); //shuffles deck again.
-        }
-    }
-
-
 
     /**
      * This method plays a turn out in the Uno game.
@@ -104,12 +87,12 @@ public class GameManager {
 
     private void playCard() {
         Scanner in = new Scanner(System.in);
-        ArrayList<Card> playableCards = new ArrayList<Card>();
+        ArrayList<Card> playableCards = new ArrayList<>();
         ArrayList<Card> curPlayerHand = players[whosTurn].getHand();
 
 
         for (Card card : curPlayerHand)
-            if (card.getColor() == cardPlayed.getColor() || card.getColor() == 'w' || card.getValue().equals(cardPlayed.getValue()))
+            if (isValidCard(card))
                 playableCards.add(card);
 
             //prints out player's hand and card at play
@@ -128,19 +111,18 @@ public class GameManager {
 
         //will automatically draw cards if you don't have any playable cards, and if you do, it'll print out the cards
         //that are playable and will ask you if you want to play a card or draw a card.
-        //#TODO: make this if statement not break the game.
         if (playableCards.size() == 0){
             String response = "N";
             while(response.equals("N")) {
-                newDeck(); //This is to make sure that the deck won't be empty while we're drawing more cards.
                 //if there's no playable cards in hand, player will draw from deck until there's a card for the player to play.
-                Card nextCard = deck.draw();
-                while (playableCards.size() == 0){
+                Card nextCard = draw();
+                while (!isValidCard(nextCard)){
+                    System.out.printf("Drew card %s\n", nextCard.toString());
                     players[whosTurn].addCard(nextCard);
-                    if (nextCard.getColor() == cardPlayed.getColor() || nextCard.getValue().equals(cardPlayed.getValue()))
+                    if (isValidCard(nextCard))
                         playableCards.add(nextCard);
                     else
-                        nextCard = deck.draw();
+                        nextCard = draw();
                 }
 
                 //This while-loop is introduced so that the only valid answers are "Y" and "N".
@@ -187,9 +169,33 @@ public class GameManager {
         }
         return new Card(color, wild.getValue());
     }
-
+    private Card draw() {
+        newDeck();
+        return deck.draw();
+    }
     private int nextTurn() {
         return (whosTurn + (dirPos ? 1 : -1) + players.length * 69) % players.length;
+    }
+
+    private boolean isValidCard(Card card) {
+        return card.getColor() == cardPlayed.getColor() || card.getValue().equals(cardPlayed.getValue()) || card.getValue().equals("w");
+    }
+
+    /**
+     * This method creates a new Uno deck, excluding cards in both player's hands.
+     */
+    private void newDeck() {
+        if (deck.size() == 0) {
+            deck = new Deck();
+
+            //removes cards from the deck that's already in player's hand & in play
+            for (Player player : players)
+                for (Card card : player.getHand())
+                    deck.removeCard(card);
+            deck.removeCard(cardPlayed);
+
+            deck.shuffle(); //shuffles deck again.
+        }
     }
 
     /*                                  MAIN METHOD FOR TESTING                                   */
