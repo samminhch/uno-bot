@@ -6,7 +6,7 @@ public class GameManager {
     private Player[] players;
     private Card cardPlayed;
     private Deck deck;
-    private int whosTurn;
+    private int whoseTurn;
     private boolean dirPos;
 
     /*
@@ -28,7 +28,7 @@ public class GameManager {
         deck = new Deck();
         deck.shuffle();
 
-        whosTurn = 0;
+        whoseTurn = 0;
         dirPos = true;
     }
 
@@ -63,9 +63,9 @@ public class GameManager {
         interpretCard();
         playCard(); //this method should be the method the AI uses to play a card.
 
-        if (players[whosTurn].size() == 1)
-            System.out.printf("Player%d: Uno!\n", whosTurn + 1);
-        whosTurn = nextTurn();
+        if (players[whoseTurn].size() == 1)
+            System.out.printf("Player%d: Uno!\n", whoseTurn + 1);
+        whoseTurn = nextTurn();
     }
 
     private void interpretCard() {
@@ -73,22 +73,22 @@ public class GameManager {
         //#TODO: fix bug where if you play a reverse card and draw, it'll still be your turn!
         if (cardValue.equals("rev")) {
             dirPos = !dirPos;
-            whosTurn = nextTurn();
+            whoseTurn = nextTurn();
         }
         else if (cardValue.equals("skp"))
-            whosTurn = nextTurn();
+            whoseTurn = nextTurn();
         else if (cardValue.matches("drw\\+\\d")) {
             int numDraws = Integer.parseInt(cardValue.substring(cardValue.indexOf("+") + 1));
 
             for(int i = 0; i < numDraws; i++)
-                players[whosTurn].addCard(deck.draw());
+                players[whoseTurn].addCard(deck.draw());
         }
     }
 
     private void playCard() {
         Scanner in = new Scanner(System.in);
         ArrayList<Card> playableCards = new ArrayList<>();
-        ArrayList<Card> curPlayerHand = players[whosTurn].getHand();
+        ArrayList<Card> curPlayerHand = players[whoseTurn].getHand();
 
 
         for (Card card : curPlayerHand)
@@ -96,7 +96,7 @@ public class GameManager {
                 playableCards.add(card);
 
             //prints out player's hand and card at play
-            System.out.println("PLAYER " + (whosTurn + 1) + ":");
+            System.out.println("PLAYER " + (whoseTurn + 1) + ":");
             System.out.printf("Card at play: %s\n", cardPlayed);
             System.out.print("PLAYABLE HAND: ");
             Collections.sort(curPlayerHand);
@@ -118,7 +118,7 @@ public class GameManager {
                 Card nextCard = draw();
                 while (!isValidCard(nextCard)){
                     System.out.printf("Drew card %s\n", nextCard.toString());
-                    players[whosTurn].addCard(nextCard);
+                    players[whoseTurn].addCard(nextCard);
                     if (isValidCard(nextCard))
                         playableCards.add(nextCard);
                     else
@@ -133,7 +133,7 @@ public class GameManager {
                 }
                 response = ans;
                 if (response.equals("Y")) {
-                    players[whosTurn].removeCard(nextCard);
+                    players[whoseTurn].removeCard(nextCard);
                     cardPlayed = wildCardCase(nextCard); //wildCardCase just converts the wild card into a colored card
                 }
             }
@@ -144,12 +144,12 @@ public class GameManager {
                 System.out.println("Pick a card to play, or enter DRAW to draw:");
                 String response = in.nextLine().toUpperCase();
                 if (response.equals("DRAW")) { //draws a card from deck and ends turn
-                    players[whosTurn].addCard(deck.draw());
+                    players[whoseTurn].addCard(deck.draw());
                     validResponse = true;
                 } else if (response.matches("\\d+")) {
                     int index = Integer.parseInt(response) - 1;
                     if (index >= 0 && index < playableCards.size()) {
-                        players[whosTurn].removeCard(playableCards.get(index));
+                        players[whoseTurn].removeCard(playableCards.get(index));
                         cardPlayed = wildCardCase(playableCards.get(index));
                         validResponse = true;
                     }
@@ -174,11 +174,11 @@ public class GameManager {
         return deck.draw();
     }
     private int nextTurn() {
-        return (whosTurn + (dirPos ? 1 : -1) + players.length * 69) % players.length;
+        return (whoseTurn + (dirPos ? 1 : -1) + players.length * 69) % players.length;
     }
 
     private boolean isValidCard(Card card) {
-        return card.getColor() == cardPlayed.getColor() || card.getValue().equals(cardPlayed.getValue()) || card.getValue().equals("w");
+        return card.getColor() == cardPlayed.getColor() || card.getValue().equals(cardPlayed.getValue()) || card.getColor() == 'w';
     }
 
     /**
