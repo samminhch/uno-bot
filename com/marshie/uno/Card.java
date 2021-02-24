@@ -3,6 +3,7 @@ package com.marshie.uno;
 public class Card implements Comparable<Card> {
     private final char color;
     private final String value;
+
     public Card(char clr, String val) {
         color = clr;
         value = val;

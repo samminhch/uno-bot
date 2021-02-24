@@ -8,9 +8,7 @@ public class Deck {
 
     public Deck() {
         deck = new Stack<Card>();
-        /*
-         * 4 = number of colors in uno deck
-         */
+
         char[] colors = {'r', 'g', 'b', 'y'};
         // add the first 100 cards, r g b & y
         for (char color : colors) {
