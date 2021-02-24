@@ -107,6 +107,7 @@ public class GameManager {
         System.out.print("PLAYABLE HAND: ");
         Collections.sort(curPlayerHand);
         Collections.sort(playableCards);
+
         for (int i = 0; i < playableCards.size() - 1; i++)
             System.out.printf("(%d) %s, ", i + 1, playableCards.get(i).toString());
         if (playableCards.size() == 0)
