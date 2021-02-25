@@ -7,6 +7,7 @@ This is a code demonstrating the power of artificial intelligence and how it mas
 4. [License](#license)
 
 ## To-Do List:
+### Making the Game:
 - [x] Fix bug where if a player uses a reverse card and then draws in a 2-player match, it'll be their turn again.
 - [x] Fix bug where if a player uses a draw card and then draws again, they'll get 2 cards again.  
 - [x] Fix bug where if you don't have any playable cards and deny the first playable card drawn, it'll allow you to play any subsequently drawn card.  
@@ -15,6 +16,8 @@ This is a code demonstrating the power of artificial intelligence and how it mas
 - [ ] Implement a stacking mechanic (i.e: if Player 1 plays a draw2 card and Player 2 plays a draw2 card and Player 1 has
   no more draw2 cards, Player 1 draws 4 cards.)
 - [ ] FINISH THE REST OF THE DARN GAME
+### Implementing the Neural Network:
+- [ ] Find out how to implement it (Maybe ask Logan for help?)
 
 ## About Code
 This code is supposed to train an artificial to learn and master the Uno(r) game in order for me

@@ -180,10 +180,12 @@ public class GameManager {
         }
         return new Card(color, wild.getValue());
     }
+
     private Card draw() {
         newDeck();
         return deck.draw();
     }
+    
     private int nextTurn() {
         return (whoseTurn + (dirPos ? 1 : -1) + players.length * 69) % players.length;
     }
