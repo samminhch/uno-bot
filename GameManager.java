@@ -8,7 +8,7 @@ import java.util.*;
  */
 public class GameManager {
     private Player[] players;
-    private Chain<Card, Boolean> playedCard; //formatted as [Card, boolean], where Card is the played card and the boolean is wether the card has been played yet
+    private Chain<Card, Boolean> playedCard; //formatted as [Card, boolean], where Card is the played card and the boolean is whether the card has been played yet
     private Deck deck;
     private int whoseTurn;
     private boolean dirPos;
