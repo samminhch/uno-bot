@@ -7,7 +7,7 @@ public class Deck {
     private final Stack<Card> deck;
 
     public Deck() {
-        deck = new Stack<Card>();
+        deck = new Stack<>();
 
         char[] colors = {'r', 'g', 'b', 'y'};
         // add the first 100 cards, r g b & y

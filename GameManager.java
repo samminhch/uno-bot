@@ -3,15 +3,19 @@ import com.marshie.util.Chain;
 
 import java.util.*;
 
+/*
+ * This class is used in order to run the Uno game.
+ */
 public class GameManager {
     private Player[] players;
-    private Chain<Card, Boolean> playedCard; //formatted as [Card, boolean], where Card is the played card and the boolean is wether the card has been played yet
+    private Chain<Card, Boolean> playedCard; //formatted as [Card, boolean], where Card is the played card and the boolean is whether the card has been played yet
     private Deck deck;
     private int whoseTurn;
     private boolean dirPos;
 
-    /*
-     * This class is used in order to run the Uno game.
+    /**
+     * Constructor for the GameManager class. Sets up the Uno game for specified amount of players.
+     * @param numPlayers the amount of players for the Uno game.
      */
     public GameManager(int numPlayers) {
         if (numPlayers < 2 || numPlayers >= 10)
@@ -21,6 +25,10 @@ public class GameManager {
         prepare(numPlayers);
     }
 
+    /**
+     * The method used to prepare the game. Creates a new players, a deck, and sets some elements.
+     * @param numPlayers the number of players that's playing.
+     */
     private void prepare(int numPlayers) {
         players = new Player[numPlayers];
         for (int i = 0; i < players.length; i++)
@@ -40,7 +48,7 @@ public class GameManager {
         for (int i = 0; i < 7; i++)
             for (Player player : players)
                 player.addCard(deck.draw());
-        playedCard = new Chain<Card, Boolean>(wildCardCase(deck.draw()), false);
+        playedCard = new Chain<>(wildCardCase(draw()), false);
 
         while (!isFinished()) {
             newDeck();
@@ -48,6 +56,10 @@ public class GameManager {
         }
     }
 
+    /**
+     * Checks if a player's hand is empty.
+     * @return <code>Boolean</code>: whether the game is finished or not.
+     */
     private boolean isFinished() {
         for(int i = 0; i < players.length; i++)
             if (players[i].getHand().size() == 0) {
@@ -70,6 +82,9 @@ public class GameManager {
         whoseTurn = nextTurn();
     }
 
+    /**
+     * This method looks at the current played card and plays out a card's effect if the card has any to play.
+     */
     private void interpretCard() {
         if (!playedCard.getVal()){
             String cardValue = playedCard.getKey().getValue();
@@ -83,8 +98,7 @@ public class GameManager {
                 int numDraws = Integer.parseInt(cardValue.substring(cardValue.indexOf("+") + 1));
 
                 for(int i = 0; i < numDraws; i++) {
-                    newDeck();
-                    Card cardDrawn = deck.draw();
+                    Card cardDrawn = draw();
                     System.out.println("Drew " + cardDrawn.toString());
                     players[whoseTurn].addCard(cardDrawn);
                 }
@@ -92,11 +106,14 @@ public class GameManager {
         }
     }
 
+    /**
+     * This method prints out information regarding the player's hand and gives them a choice to play a card from it
+     * or to draw a card from the deck.
+     */
     private void playCard() {
         Scanner in = new Scanner(System.in);
         ArrayList<Card> playableCards = new ArrayList<>();
         ArrayList<Card> curPlayerHand = players[whoseTurn].getHand();
-
 
         for (Card card : curPlayerHand)
             if (isValidCard(card))
@@ -107,6 +124,7 @@ public class GameManager {
         System.out.print("PLAYABLE HAND: ");
         Collections.sort(curPlayerHand);
         Collections.sort(playableCards);
+
         for (int i = 0; i < playableCards.size() - 1; i++)
             System.out.printf("(%d) %s, ", i + 1, playableCards.get(i).toString());
         if (playableCards.size() == 0)
@@ -151,7 +169,7 @@ public class GameManager {
                 System.out.println("Pick a card to play, or enter DRAW to draw:");
                 String response = in.nextLine().toUpperCase();
                 if (response.equals("DRAW")) { //draws a card from deck and ends turn
-                    players[whoseTurn].addCard(deck.draw());
+                    players[whoseTurn].addCard(draw());
                     validResponse = true;
                     playedCard.setVal(true);
                 } else if (response.matches("\\d+")) {
@@ -175,18 +193,34 @@ public class GameManager {
         while(!Character.toString(color).matches("[rgby]")){
             System.out.println("Choose a color for the wild card: 'r' for Red, 'g' for Green, 'b' for Blue, 'y' for Yellow");
             String response = in.nextLine();
+            //the ternary operator is used to counter the possibility that someone will enter ""
             color = response.equals("") ? '\0' : response.charAt(0);
         }
         return new Card(color, wild.getValue());
     }
+
+    /**
+     * This method draws a card from the deck. If the deck is empty and this method is called then a new deck will be
+     * created without the card that are in each player's hand and at play.
+     * @return <code>Card</code>: a card from the deck.
+     */
     private Card draw() {
         newDeck();
         return deck.draw();
     }
+
+    /**
+     * @return <code>int</code>: a number indicating which player will be playing next.
+     */
     private int nextTurn() {
         return (whoseTurn + (dirPos ? 1 : -1) + players.length * 69) % players.length;
     }
 
+    /**
+     * @param card the card that's being checked.
+     * @return <code>boolean</code>: Whether the card given is a wild card or its color/value matches the playedCard's
+     * value/color
+     */
     private boolean isValidCard(Card card) {
         return card.getColor() == playedCard.getKey().getColor() || card.getValue().equals(playedCard.getKey().getValue()) || card.getColor() == 'w';
     }

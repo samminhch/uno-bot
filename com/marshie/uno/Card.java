@@ -35,10 +35,6 @@ public class Card implements Comparable<Card> {
         return value;
     }
 
-    public String toString() {
-        return color + " " + value;
-    }
-
     /**
      * Compares colors first and then value second. Compared alphabetically??
      * @param c the comparison card.
@@ -51,5 +47,9 @@ public class Card implements Comparable<Card> {
             return -1;
         else
             return value.compareTo(c.getValue());
+    }
+
+    public String toString() {
+        return color + " " + value;
     }
 }
