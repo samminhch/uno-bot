@@ -18,6 +18,7 @@ This is a code demonstrating the power of artificial intelligence and how it mas
 - [ ] FINISH THE REST OF THE DARN GAME
 ### Implementing the Neural Network:
 - [ ] Find out how to implement it (Maybe ask Logan for help?)
+- [ ] Rework game so that it'll be easier to make artificial intelligence for.
 
 ## About Code
 This code is supposed to train an artificial to learn and master the Uno(r) game in order for me

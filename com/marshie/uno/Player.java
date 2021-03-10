@@ -4,9 +4,11 @@ import java.util.*;
 
 public class Player {
     private final ArrayList<Card> hand;
+    private final boolean isAI;
 
-    public Player() {
+    public Player(boolean isBot) {
         hand = new ArrayList<>();
+        isAI = isBot;
     }
 
     public ArrayList<Card> getHand() {

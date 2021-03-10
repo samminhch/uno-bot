@@ -1,5 +1,4 @@
 import com.marshie.uno.*;
-import com.marshie.util.Chain;
 
 import java.util.*;
 
@@ -8,9 +7,20 @@ import java.util.*;
  */
 public class GameManager {
     private Player[] players;
-    private Chain<Card, Boolean> playedCard; //formatted as [Card, boolean], where Card is the played card and the boolean is whether the card has been played yet
+
+    /*
+     * formatted as [byte, byte] where the first byte signifying if what type of streak it is (0 for null, 1 for
+     * +2 card, 2 for +4 card), and the second byte being how high the streak is
+     */
+    private byte[] streak;
+    /*
+     * formatted as [Card, boolean, byte, byte], where Card is the current card played, boolean is whether the card has
+     * been played, the first byte is the player that played that card, and the second byte is whether the first card
+     * played in a stack is a normal card, a draw+2 card, or a draw+4 card.
+     */
+    private Object[] playedCard;
     private Deck deck;
-    private int whoseTurn;
+    private byte whoseTurn;
     private boolean dirPos;
 
     /**
@@ -32,13 +42,16 @@ public class GameManager {
     private void prepare(int numPlayers) {
         players = new Player[numPlayers];
         for (int i = 0; i < players.length; i++)
-            players[i] = new Player();
+            players[i] = new Player(false);
 
         deck = new Deck();
         deck.shuffle();
 
-        whoseTurn = 0;
+        playedCard = new Object[4];
+
         dirPos = true;
+        whoseTurn = 0;
+        streak = new byte[2];
     }
 
     /**
@@ -48,7 +61,10 @@ public class GameManager {
         for (int i = 0; i < 7; i++)
             for (Player player : players)
                 player.addCard(deck.draw());
-        playedCard = new Chain<>(wildCardCase(draw()), false);
+
+        playedCard[0] = wildCardCase(draw());
+        playedCard[1] = false;
+        playedCard[2] = -1;
 
         while (!isFinished()) {
             newDeck();
@@ -73,35 +89,42 @@ public class GameManager {
      * This method plays a turn out in the Uno game.
      */
     public void turn() {
-        System.out.printf("Player %d:\n", whoseTurn + 1);
         interpretCard();
         playCard(); //this method should be the method the AI uses to play a card.
 
         if (players[whoseTurn].size() == 1)
             System.out.println("Uno!");
-        whoseTurn = nextTurn();
+        whoseTurn = nextTurn(false);
     }
 
     /**
      * This method looks at the current played card and plays out a card's effect if the card has any to play.
      */
     private void interpretCard() {
-        if (!playedCard.getVal()){
-            String cardValue = playedCard.getKey().getValue();
+        if (!(boolean) playedCard[1]){
+            String cardValue = ((Card)playedCard[0]).getValue();
+            // #TODO: Reverse card does not function correctly when more than two players are in a game.
             if (cardValue.equals("rev")) {
                 dirPos = !dirPos;
-                whoseTurn = nextTurn();
+                whoseTurn = nextTurn(false);
+                System.out.printf("Player %d:\n", whoseTurn + 1);
             }
-            else if (cardValue.equals("skp"))
-                whoseTurn = nextTurn();
+            else if (cardValue.equals("skp")) {
+                whoseTurn = nextTurn(false);
+                System.out.printf("Player %d:\n", whoseTurn + 1);
+            }
             else if (cardValue.matches("drw\\+\\d")) {
                 int numDraws = Integer.parseInt(cardValue.substring(cardValue.indexOf("+") + 1));
+                System.out.printf("Player %d:\n", whoseTurn + 1);
 
                 for(int i = 0; i < numDraws; i++) {
                     Card cardDrawn = draw();
                     System.out.println("Drew " + cardDrawn.toString());
                     players[whoseTurn].addCard(cardDrawn);
                 }
+            }
+            else {
+                System.out.printf("Player %d:\n", whoseTurn + 1);
             }
         }
     }
@@ -120,7 +143,7 @@ public class GameManager {
                 playableCards.add(card);
 
         //prints out player's hand and card at play
-        System.out.printf("Card at play: %s\n", playedCard.getKey());
+        System.out.printf("Card at play: %s\n", playedCard[0]);
         System.out.print("PLAYABLE HAND: ");
         Collections.sort(curPlayerHand);
         Collections.sort(playableCards);
@@ -157,9 +180,7 @@ public class GameManager {
                 }
                 response = ans;
                 if (response.equals("Y")) {
-                    players[whoseTurn].removeCard(nextCard);
-                    playedCard.setKey(wildCardCase(nextCard)); //wildCardCase just converts the wild card into a colored card
-                    playedCard.setVal(false);
+                    play(nextCard);
                 }
             }
         }
@@ -169,20 +190,35 @@ public class GameManager {
                 System.out.println("Pick a card to play, or enter DRAW to draw:");
                 String response = in.nextLine().toUpperCase();
                 if (response.equals("DRAW")) { //draws a card from deck and ends turn
-                    players[whoseTurn].addCard(draw());
+                    Card nextCard = draw();
+                    players[whoseTurn].addCard(nextCard);
+                    setPlayedCard(nextCard);
                     validResponse = true;
-                    playedCard.setVal(true);
-                } else if (response.matches("\\d+")) {
+                    System.out.printf("Drew %s\n", nextCard.toString());
+                } else if (response.matches("\\d+")) { //case that you actually choose a playable card
                     int index = Integer.parseInt(response) - 1;
                     if (index >= 0 && index < playableCards.size()) {
-                        players[whoseTurn].removeCard(playableCards.get(index));
-                        playedCard.setKey(wildCardCase(playableCards.get(index)));
-                        playedCard.setVal(false);
+                        //case that you chose a draw card
+                        //if(playableCards.get(index).getValue().matches("drw\\+\\d")
+
+                        play(playableCards.get(index));
                         validResponse = true;
                     }
                 }
             }
         }
+    }
+
+    private void play (Card c) {
+        //#TODO: finish case where person draws a +2/+4 card
+        String value = c.getValue();
+        if (value.matches("drw\\+\\d")) {
+            byte drwNum = Byte.parseByte(value.substring(value.length() - 1));
+
+            //switch (value)
+        }
+        players[whoseTurn].removeCard(c);
+        setPlayedCard(wildCardCase(c));
     }
 
     private Card wildCardCase(Card wild){
@@ -209,11 +245,17 @@ public class GameManager {
         return deck.draw();
     }
 
+    private void setPlayedCard(Card card) {
+        playedCard[0] = card;
+        playedCard[1] = false;
+        playedCard[2] = whoseTurn;
+    }
+
     /**
      * @return <code>int</code>: a number indicating which player will be playing next.
      */
-    private int nextTurn() {
-        return (whoseTurn + (dirPos ? 1 : -1) + players.length * 69) % players.length;
+    private byte nextTurn(boolean getNegDir) {
+        return (byte) ((whoseTurn + ((getNegDir != dirPos) ? 1 : -1) + players.length * 69) % players.length);
     }
 
     /**
@@ -222,7 +264,7 @@ public class GameManager {
      * value/color
      */
     private boolean isValidCard(Card card) {
-        return card.getColor() == playedCard.getKey().getColor() || card.getValue().equals(playedCard.getKey().getValue()) || card.getColor() == 'w';
+        return card.getColor() == ((Card)playedCard[0]).getColor() || card.getValue().equals(((Card)playedCard[0]).getValue()) || card.getColor() == 'w';
     }
 
     /**
@@ -236,7 +278,7 @@ public class GameManager {
             for (Player player : players)
                 for (Card card : player.getHand())
                     deck.removeCard(card);
-            deck.removeCard(playedCard.getKey());
+            deck.removeCard((Card)playedCard[0]);
 
             deck.shuffle(); //shuffles deck again.
         }
