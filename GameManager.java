@@ -9,10 +9,10 @@ public class GameManager {
     private Player[] players;
 
     /*
-     * formatted as [byte, byte] where the first byte signifying if what type of streak it is (0 for null, 1 for
-     * +2 card, 2 for +4 card), and the second byte being how high the streak is
+     * formatted as [boolean, byte] where the boolean is whether a streak is occurring and the byte being how high the
+     * streak is. will probably be reworked later since I would like this option to be configurable.
      */
-    private byte[] streak;
+    private Object[] streak;
     /*
      * formatted as [Card, boolean, byte, byte], where Card is the current card played, boolean is whether the card has
      * been played, the first byte is the player that played that card, and the second byte is whether the first card
@@ -51,7 +51,9 @@ public class GameManager {
 
         dirPos = true;
         whoseTurn = 0;
-        streak = new byte[2];
+        streak = new Object[2];
+        streak[0] = false;
+        streak[1] = (byte) 0;
     }
 
     /**
@@ -147,8 +149,12 @@ public class GameManager {
 
         //prints out player's hand and card at play
         System.out.printf("Card at play: %s\n", playedCard[0]);
-        if (streak[0] != 0) {
-            System.out.printf("%s streak: %d\n", ((Card)playedCard[0]).getValue(), streak[1]);
+        /*
+         * The total number of cards that will be added to your deck if you don't play a draw+2 or draw+4 card. Those
+         * cards will also be added towards all the other cards you draw if you choose the DRAW option.
+         */
+        if ((boolean) streak[0]) {
+            System.out.printf("total value from draw cards: %d\n", (byte) streak[1]);
         }
         System.out.print("PLAYABLE HAND: ");
         Collections.sort(curPlayerHand);
@@ -177,7 +183,7 @@ public class GameManager {
                     else
                         nextCard = draw();
                 }
-
+                System.out.printf("Drew card %s\n", nextCard.toString());
                 //This while-loop is introduced so that the only valid answers are "Y" and "N".
                 String ans = "";
                 while(!ans.matches("[YN]")){
@@ -212,30 +218,30 @@ public class GameManager {
         }
     }
 
+    /**
+     * This method handles the player actually playing a card. This method takes in a Card, and checks for a draw card.
+     * In the case that the Card passed is a draw card, it will count towards the 'card streak'. This Uno game may
+     * be a little different from the Uno games other people have played, because you can stack a draw+4 card over a
+     * draw+2 card. This method will be changed later once I polish up the game so that the option of stacking can be
+     * configurable.
+     * @param c The card that's going to be played.
+     */
     private void play (Card c) {
         //#TODO: finish case where person draws a +2/+4 card
         String value = c.getValue();
-        if (value.matches("drw\\+\\d")) {
-            byte drwNum = Byte.parseByte(value.substring(value.length() - 1));
-
-            if (drwNum == 2) {
-                streak[1] = streak[1] == 1 ? (byte)(streak[1] + 1) : (byte) 1;
-                streak[0] = 1;
-
-            }
-            if (drwNum == 4) {
-                streak[1] = streak[1] == 2 ? (byte)(streak[1] + 1) : (byte) 1;
-                streak[0] = 2;
-            }
+        if (value.matches("drw\\+2") || value.matches("drw\\+4")) {
+            byte val = Byte.parseByte(c.getValue().substring(value.length() - 1));
+            streak[0] = true;
+            streak[1] = (byte) ((byte) streak[1] + val);
         }
         else {
-            for (int i = 0; i < (streak[0] == 1 ? 2 : streak[0] == 2 ? 4 : 0) * streak[1]; i++) {
+            for (int i = 0; i < (byte) streak[1]; i++) {
                 Card drawnCard = draw();
                 System.out.printf("Drew %s\n", drawnCard.toString());
                 players[whoseTurn].addCard(drawnCard);
             }
-            streak[0] = 0;
-            streak[1] = 0;
+            streak[0] = false;
+            streak[1] = (byte) 0;
         }
         players[whoseTurn].removeCard(c);
         setPlayedCard(wildCardCase(c));
