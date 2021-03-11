@@ -14,9 +14,9 @@ This is a code demonstrating the power of artificial intelligence and how it mas
 - [x] Fix bug where if you play a draw card the opponent doesn't actually draw cards.
 - [x] Fix bug where BufferedReader randomly crashes and breaks the game. ~~I still don't know how to fix that.~~ It was actually a scanner problem and I closed the scanner in the wild-card method.
 - [ ] Fix skipping bug (no urgent, as it only applies to games where more than 2 people are playing, which isn't what we're training our AI to do atm.)  
-- [ ] Implement a stacking mechanic (i.e: if Player 1 plays a draw2 card and Player 2 plays a draw2 card and Player 1 has
+- [x] Implement a stacking mechanic (i.e: if Player 1 plays a draw2 card and Player 2 plays a draw2 card and Player 1 has
   no more draw2 cards, Player 1 draws 4 cards.)
-- [ ] FINISH THE REST OF THE DARN GAME
+- [x] FINISH THE REST OF THE DARN GAME (it's basically done so i'm marking it as such)
 ### Implementing the Neural Network:
 - [ ] Find out how to implement it (Maybe ask Logan for help?)
 - [ ] Rework game so that it'll be easier to make artificial intelligence for.

@@ -113,16 +113,19 @@ public class GameManager {
                 whoseTurn = nextTurn(false);
                 System.out.printf("Player %d:\n", whoseTurn + 1);
             }
-            else if (cardValue.matches("drw\\+\\d")) {
-                int numDraws = Integer.parseInt(cardValue.substring(cardValue.indexOf("+") + 1));
-                System.out.printf("Player %d:\n", whoseTurn + 1);
-
-                for(int i = 0; i < numDraws; i++) {
-                    Card cardDrawn = draw();
-                    System.out.println("Drew " + cardDrawn.toString());
-                    players[whoseTurn].addCard(cardDrawn);
-                }
-            }
+            /*
+             * This doesn't need to be here since it gets interpreted whenever a player plays a card.
+             */
+//            else if (cardValue.matches("drw\\+\\d")) {
+//                int numDraws = Integer.parseInt(cardValue.substring(cardValue.indexOf("+") + 1));
+//                System.out.printf("Player %d:\n", whoseTurn + 1);
+//
+//                for(int i = 0; i < numDraws; i++) {
+//                    Card cardDrawn = draw();
+//                    System.out.println("Drew " + cardDrawn.toString());
+//                    players[whoseTurn].addCard(cardDrawn);
+//                }
+//            }
             else {
                 System.out.printf("Player %d:\n", whoseTurn + 1);
             }
@@ -144,6 +147,9 @@ public class GameManager {
 
         //prints out player's hand and card at play
         System.out.printf("Card at play: %s\n", playedCard[0]);
+        if (streak[0] != 0) {
+            System.out.printf("%s streak: %d\n", ((Card)playedCard[0]).getValue(), streak[1]);
+        }
         System.out.print("PLAYABLE HAND: ");
         Collections.sort(curPlayerHand);
         Collections.sort(playableCards);
@@ -198,9 +204,6 @@ public class GameManager {
                 } else if (response.matches("\\d+")) { //case that you actually choose a playable card
                     int index = Integer.parseInt(response) - 1;
                     if (index >= 0 && index < playableCards.size()) {
-                        //case that you chose a draw card
-                        //if(playableCards.get(index).getValue().matches("drw\\+\\d")
-
                         play(playableCards.get(index));
                         validResponse = true;
                     }
@@ -215,7 +218,24 @@ public class GameManager {
         if (value.matches("drw\\+\\d")) {
             byte drwNum = Byte.parseByte(value.substring(value.length() - 1));
 
-            //switch (value)
+            if (drwNum == 2) {
+                streak[1] = streak[1] == 1 ? (byte)(streak[1] + 1) : (byte) 1;
+                streak[0] = 1;
+
+            }
+            if (drwNum == 4) {
+                streak[1] = streak[1] == 2 ? (byte)(streak[1] + 1) : (byte) 1;
+                streak[0] = 2;
+            }
+        }
+        else {
+            for (int i = 0; i < (streak[0] == 1 ? 2 : streak[0] == 2 ? 4 : 0) * streak[1]; i++) {
+                Card drawnCard = draw();
+                System.out.printf("Drew %s\n", drawnCard.toString());
+                players[whoseTurn].addCard(drawnCard);
+            }
+            streak[0] = 0;
+            streak[1] = 0;
         }
         players[whoseTurn].removeCard(c);
         setPlayedCard(wildCardCase(c));
