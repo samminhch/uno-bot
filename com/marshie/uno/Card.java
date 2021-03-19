@@ -1,12 +1,19 @@
 package com.marshie.uno;
 
 public class Card implements Comparable<Card> {
+    private static final String UNO_CARD_REGEX = "[RGBYWrgbyw] [0-9]|rev|wld|skp|drw\\+[024]";
     private final char color;
     private final String value;
 
     public Card(char clr, String val) {
         color = clr;
         value = val;
+    }
+
+    public static Card parseCard (String str) throws IllegalArgumentException {
+        if (!str.matches(UNO_CARD_REGEX))
+            throw new IllegalArgumentException(String.format("%s doesn't match with REGEX (\"%s\")", str, UNO_CARD_REGEX));
+        return new Card (str.charAt(0), str.trim().substring(2));
     }
 
     /**

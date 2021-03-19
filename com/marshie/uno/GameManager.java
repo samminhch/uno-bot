@@ -1,4 +1,6 @@
-import com.marshie.uno.*;
+package com.marshie.uno;
+
+import com.marshie.uno.players.*;
 
 import java.util.*;
 
@@ -24,7 +26,7 @@ public class GameManager {
     private boolean dirPos;
 
     /**
-     * Constructor for the GameManager class. Sets up the Uno game for specified amount of players.
+     * Constructor for the com.marshie.uno.GameManager class. Sets up the Uno game for specified amount of players.
      * @param numPlayers the amount of players for the Uno game.
      */
     public GameManager(int numPlayers) {
@@ -42,7 +44,7 @@ public class GameManager {
     private void prepare(int numPlayers) {
         players = new Player[numPlayers];
         for (int i = 0; i < players.length; i++)
-            players[i] = new Player(false);
+            players[i] = new Player();
 
         deck = new Deck();
         deck.shuffle();
@@ -59,7 +61,7 @@ public class GameManager {
     /**
      * This will set up a new Uno game and play until the game is finished.
      */
-    public void startGame() {
+    public int playGame() {
         for (int i = 0; i < 7; i++)
             for (Player player : players)
                 player.addCard(deck.draw());
@@ -68,23 +70,26 @@ public class GameManager {
         playedCard[1] = false;
         playedCard[2] = -1;
 
-        while (!isFinished()) {
+        int winner = -1;
+        while (winner == -1) {
             newDeck();
             turn();
+            winner = isFinished();
         }
+        return winner;
     }
 
     /**
      * Checks if a player's hand is empty.
      * @return <code>Boolean</code>: whether the game is finished or not.
      */
-    private boolean isFinished() {
+    private int isFinished() {
         for(int i = 0; i < players.length; i++)
             if (players[i].getHand().size() == 0) {
                 System.out.printf("Player %d won!\n", i + 1);
-                return true;
+                return i;
             }
-        return false;
+        return -1;
     }
 
     /**
@@ -156,66 +161,66 @@ public class GameManager {
         if ((boolean) streak[0]) {
             System.out.printf("total value from draw cards: %d\n", (byte) streak[1]);
         }
-        System.out.print("PLAYABLE HAND: ");
-        Collections.sort(curPlayerHand);
-        Collections.sort(playableCards);
-
-        for (int i = 0; i < playableCards.size() - 1; i++)
-            System.out.printf("(%d) %s, ", i + 1, playableCards.get(i).toString());
-        if (playableCards.size() == 0)
-            System.out.println("null");
-        else
-            System.out.printf("(%d) %s\n", playableCards.size(), playableCards.get(playableCards.size() - 1).toString());
-        System.out.printf("FULL HAND: (%d cards) %s\n", curPlayerHand.size(), curPlayerHand.toString());
-
-        //will automatically draw cards if you don't have any playable cards, and if you do, it'll print out the cards
-        //that are playable and will ask you if you want to play a card or draw a card.
-        if (playableCards.size() == 0){
-            String response = "N";
-            while(response.equals("N")) {
-                //if there's no playable cards in hand, player will draw from deck until there's a card for the player to play.
-                Card nextCard = draw();
-                while (!isValidCard(nextCard)){
-                    System.out.printf("Drew card %s\n", nextCard.toString());
-                    players[whoseTurn].addCard(nextCard);
-                    if (isValidCard(nextCard))
-                        playableCards.add(nextCard);
-                    else
-                        nextCard = draw();
-                }
-                System.out.printf("Drew card %s\n", nextCard.toString());
-                //This while-loop is introduced so that the only valid answers are "Y" and "N".
-                String ans = "";
-                while(!ans.matches("[YN]")){
-                    System.out.printf("Play card %s? Y/N?\n", nextCard.toString());
-                    ans = in.nextLine().toUpperCase();
-                }
-                response = ans;
-                if (response.equals("Y")) {
-                    play(nextCard);
-                }
-            }
-        }
-        else {
-            boolean validResponse = false;
-            while (!validResponse) {
-                System.out.println("Pick a card to play, or enter DRAW to draw:");
-                String response = in.nextLine().toUpperCase();
-                if (response.equals("DRAW")) { //draws a card from deck and ends turn
-                    Card nextCard = draw();
-                    players[whoseTurn].addCard(nextCard);
-                    setPlayedCard(nextCard);
-                    validResponse = true;
-                    System.out.printf("Drew %s\n", nextCard.toString());
-                } else if (response.matches("\\d+")) { //case that you actually choose a playable card
-                    int index = Integer.parseInt(response) - 1;
-                    if (index >= 0 && index < playableCards.size()) {
-                        play(playableCards.get(index));
-                        validResponse = true;
-                    }
-                }
-            }
-        }
+//        System.out.print("PLAYABLE HAND: ");
+//        Collections.sort(curPlayerHand);
+//        Collections.sort(playableCards);
+//
+//        for (int i = 0; i < playableCards.size() - 1; i++)
+//            System.out.printf("(%d) %s, ", i + 1, playableCards.get(i).toString());
+//        if (playableCards.size() == 0)
+//            System.out.println("null");
+//        else
+//            System.out.printf("(%d) %s\n", playableCards.size(), playableCards.get(playableCards.size() - 1).toString());
+//        System.out.printf("FULL HAND: (%d cards) %s\n", curPlayerHand.size(), curPlayerHand.toString());
+//
+//        //will automatically draw cards if you don't have any playable cards, and if you do, it'll print out the cards
+//        //that are playable and will ask you if you want to play a card or draw a card.
+//        if (playableCards.size() == 0){
+//            String response = "N";
+//            while(response.equals("N")) {
+//                //if there's no playable cards in hand, player will draw from deck until there's a card for the player to play.
+//                Card nextCard = draw();
+//                while (!isValidCard(nextCard)){
+//                    System.out.printf("Drew card %s\n", nextCard.toString());
+//                    players[whoseTurn].addCard(nextCard);
+//                    if (isValidCard(nextCard))
+//                        playableCards.add(nextCard);
+//                    else
+//                        nextCard = draw();
+//                }
+//                System.out.printf("Drew card %s\n", nextCard.toString());
+//                //This while-loop is introduced so that the only valid answers are "Y" and "N".
+//                String ans = "";
+//                while(!ans.matches("[YN]")){
+//                    System.out.printf("Play card %s? Y/N?\n", nextCard.toString());
+//                    ans = in.nextLine().toUpperCase();
+//                }
+//                response = ans;
+//                if (response.equals("Y")) {
+//                    play(nextCard);
+//                }
+//            }
+//        }
+//        else {
+//            boolean validResponse = false;
+//            while (!validResponse) {
+//                System.out.println("Pick a card to play, or enter DRAW to draw:");
+//                String response = in.nextLine().toUpperCase();
+//                if (response.equals("DRAW")) { //draws a card from deck and ends turn
+//                    Card nextCard = draw();
+//                    players[whoseTurn].addCard(nextCard);
+//                    setPlayedCard(nextCard);
+//                    validResponse = true;
+//                    System.out.printf("Drew %s\n", nextCard.toString());
+//                } else if (response.matches("\\d+")) { //case that you actually choose a playable card
+//                    int index = Integer.parseInt(response) - 1;
+//                    if (index >= 0 && index < playableCards.size()) {
+//                        play(playableCards.get(index));
+//                        validResponse = true;
+//                    }
+//                }
+//            }
+//        }
     }
 
     /**
@@ -227,7 +232,6 @@ public class GameManager {
      * @param c The card that's going to be played.
      */
     private void play (Card c) {
-        //#TODO: finish case where person draws a +2/+4 card
         String value = c.getValue();
         if (value.matches("drw\\+2") || value.matches("drw\\+4")) {
             byte val = Byte.parseByte(c.getValue().substring(value.length() - 1));
@@ -301,19 +305,12 @@ public class GameManager {
             deck = new Deck();
 
             //removes cards from the deck that's already in player's hand & in play
-            for (Player player : players)
+            for (InputPlayer player : players)
                 for (Card card : player.getHand())
                     deck.removeCard(card);
             deck.removeCard((Card)playedCard[0]);
 
             deck.shuffle(); //shuffles deck again.
         }
-    }
-
-    /*                                  MAIN METHOD FOR TESTING                                   */
-
-    public static void main(String[] args) {
-        GameManager game = new GameManager(2);
-        game.startGame();
     }
 }
