@@ -5,25 +5,18 @@ import com.marshie.uno.Card;
 import java.util.ArrayList;
 
 public interface Player {
-    ArrayList<Card> hand = new ArrayList<>();
 
-    String playCard(Card cardAtPlay, int stackStreak);
+    int size ();
 
-    default int size () {
-        return hand.size();
-    }
+    ArrayList<Card> getHand ();
 
-    default ArrayList<Card> getHand () {
-        return hand;
-    }
+    void addCard (Card card);
 
-    default void addCard (Card card) {
-        hand.add(card);
-    }
+    void removeCard (Card card);
 
-    default void removeCard (Card card) {
-        hand.remove(card);
-    }
+    boolean playGivenCard(Card card);
+
+    String playCard(Card cardAtPlay, byte stackStreak);
 
     default boolean isValidCard(Card card, Card cardAtPlay) {
         return card.getColor() == cardAtPlay.getColor() || card.getValue().equals(cardAtPlay.getValue()) || card.getColor() == 'w';
