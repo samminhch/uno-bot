@@ -20,9 +20,10 @@ This is a code demonstrating the power of artificial intelligence and how it mas
 #### Not Urgent:
 - [ ] Fix skipping bug (no urgent, as it only applies to game where more than 2 people are playing, which isn't what we're training our AI to do atm.)
 - [ ] Make the stacking option configurable.
+- [x] Add a stats class (for some reason??? I have no idea why I did that)
 ### Implementing the Neural Network:
 - [ ] Find out how to implement it (Maybe ask Logan for help?)
-- [ ] Rework game so that it'll be easier to make artificial intelligence for.
+- [ ] Rework game so that it'll be easier to make artificial intelligence for (in progress)
 
 ## About Code
 This code is supposed to train an artificial to learn and master the Uno(r) game in order for me

@@ -194,7 +194,7 @@ public class GameManager {
         else {
             for (int i = 0; i < (byte) streak[1]; i++) {
                 Card drawnCard = draw();
-                System.out.printf("Drew %s\n", drawnCard.toString());
+                //System.out.printf("Drew %s\n", drawnCard.toString());
                 players[whoseTurn].addCard(drawnCard);
             }
             streak[0] = false;

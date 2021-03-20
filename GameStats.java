@@ -8,10 +8,12 @@ public class GameStats {
         game = new GameManager(numPlayers);
     }
     public void test (int numTests) {
+        long startTime = System.nanoTime();
         for (int i = 0; i < numTests; i++)
             winCounter[game.playGame()]++;
+        double secondsTook = (System.nanoTime() - startTime) / Math.pow(10, 9);
 
-        System.out.printf("%d GAMES PLAYED:\n");
+        System.out.printf("%d GAMES PLAYED (%.4e):\n", numTests, secondsTook);
         for (int i = 0; i < winCounter.length; i++)
             System.out.printf("Player %d: %.2f%% (%dW/%dL)\n", i + 1, (double)winCounter[i] / numTests, winCounter[i], numTests - winCounter[i]);
     }
