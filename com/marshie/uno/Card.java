@@ -10,10 +10,11 @@ public class Card implements Comparable<Card> {
         value = val;
     }
 
-    public static Card parseCard (String str) throws IllegalArgumentException {
-        if (!str.matches(UNO_CARD_REGEX))
-            throw new IllegalArgumentException(String.format("%s doesn't match with REGEX (\"%s\")", str, UNO_CARD_REGEX));
-        return new Card (str.charAt(0), str.trim().substring(2));
+    public static Card parseCard(String str)throws IllegalArgumentException {
+        if (!str.matches(VALID_CARD_REGEX))
+            throw new IllegalArgumentException(String.format("Input string %s doesn't match %s", str, VALID_CARD_REGEX));
+
+        return new Card (str.toLowerCase().charAt(0), str.toLowerCase().substring(2));
     }
 
     /**
