@@ -1,9 +1,10 @@
 package com.marshie.uno;
 
 public class Card implements Comparable<Card> {
-    private static final String UNO_CARD_REGEX = "[RGBYWrgbyw] [0-9]|rev|wld|skp|drw\\+[024]";
     private final char color;
     private final String value;
+    public static final int NUM_COLORS = 4;
+    public static final String VALID_CARD_REGEX = "([RGBYrgby] [0-9])|([Ww] drw\\+[024])";
 
     public Card(char clr, String val) {
         color = clr;
