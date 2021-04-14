@@ -9,8 +9,8 @@ public class Main {
     public static void main(String[] args) {
         //creates a new Uno game for 2 players.
         GameManager game = new GameManager(2);
-        game.setPlayer(0, "input");
-        game.setPlayer(1, "input");
-        game.playGame();
+        game.setPlayer(0, "rand");
+        game.setPlayer(1, "rand");
+        System.out.println(game.playGame());
     }
 }

@@ -58,6 +58,12 @@ public class Card implements Comparable<Card> {
             return value.compareTo(c.getValue());
     }
 
+    public boolean equals(Object o) {
+        if (o instanceof Card)
+            return this.compareTo((Card) o) == 0;
+        return false;
+    }
+
     public String toString() {
         return color + " " + value;
     }

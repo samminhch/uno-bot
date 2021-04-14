@@ -24,6 +24,7 @@ public class GameManager {
     private Deck deck;
     private byte whoseTurn;
     private boolean dirPos;
+    private boolean canStillDraw;
 
     /**
      * Constructor for the com.marshie.uno.GameManager class. Sets up the Uno game for specified amount of players.
@@ -73,13 +74,17 @@ public class GameManager {
 
         dirPos = true;
         whoseTurn = 0;
+        canStillDraw = true;
+
         streak = new Object[2];
         streak[0] = false;
         streak[1] = (byte) 0;
     }
 
     /**
-     * This will set up a new Uno game and play until the game is finished.
+     *
+     * @return <code>int</code>- The player who won the game, starting from the 0th index. Method will return -1 if the
+     * game ends with the players not being able to draw cards from the deck.
      */
     public int playGame() {
         for (int i = 0; i < 7; i++)
@@ -93,6 +98,8 @@ public class GameManager {
         int winner = -1;
         while (winner == -1) {
             newDeck();
+            if (!canStillDraw)
+                return -1;
             turn();
             winner = isFinished();
         }
@@ -104,9 +111,14 @@ public class GameManager {
      * @return <code>Boolean</code>: whether the game is finished or not.
      */
     private int isFinished() {
+        int total = 0;
+        for(Player p : players)
+            total += p.size();
+        if (total == Deck.SIZE)
+            return -1;
         for(int i = 0; i < players.length; i++)
             if (players[i].getHand().size() == 0) {
-                //System.out.printf("Player %d won!\n", i + 1);
+                System.out.printf("Player %d won!\n", i + 1);
                 return i;
             }
         return -1;
@@ -119,8 +131,8 @@ public class GameManager {
         interpretCard();
         playCard(); //this method should be the method the AI uses to play a card.
 
-//        if (players[whoseTurn].size() == 1)
-//            System.out.println("Uno!");
+        if (players[whoseTurn].size() == 1)
+            System.out.println("Uno!");
         whoseTurn = nextTurn(false);
     }
 
@@ -134,15 +146,15 @@ public class GameManager {
             if (cardValue.equals("rev")) {
                 dirPos = !dirPos;
                 whoseTurn = nextTurn(false);
-                //System.out.printf("Player %d:\n", whoseTurn + 1);
+                System.out.printf("Player %d:\n", whoseTurn + 1);
             }
             else if (cardValue.equals("skp")) {
                 whoseTurn = nextTurn(false);
-                //System.out.printf("Player %d:\n", whoseTurn + 1);
+                System.out.printf("Player %d:\n", whoseTurn + 1);
             }
-//            else {
-//                System.out.printf("Player %d:\n", whoseTurn + 1);
-//            }
+            else {
+                System.out.printf("Player %d:\n", whoseTurn + 1);
+            }
         }
     }
 
@@ -153,27 +165,28 @@ public class GameManager {
     private void playCard() {
 
         //prints out and card at play
-       // System.out.printf("Card at play: %s\n", playedCard[0]);
+        System.out.printf("Card at play: %s\n", playedCard[0]);
         /*
          * The total number of cards that will be added to your deck if you don't play a draw+2 or draw+4 card. Those
          * cards will also be added towards all the other cards you draw if you choose the DRAW option.
          */
-//        if ((boolean) streak[0])
-//            System.out.printf("total value from draw cards: %d\n", (byte) streak[1]);
-
-        String res = players[whoseTurn].playCard((Card) playedCard[0], (byte) streak[1]);
-        if (res == null) {
-            Card drawnCard = draw();
-            //System.out.printf("Drew %s\n", drawnCard.toString());
-            while (!isValidCard(drawnCard))
-                drawnCard = draw();
-            if (players[whoseTurn].playGivenCard(drawnCard))
-                play(drawnCard);
+        if ((boolean) streak[0])
+            System.out.printf("total value from draw cards: %d\n", (byte) streak[1]);
+        if (canStillDraw) {
+            String res = players[whoseTurn].playCard((Card) playedCard[0], (byte) streak[1]);
+            if (res == null) {
+                Card drawnCard = draw();
+                System.out.printf("Drew %s\n", drawnCard.toString());
+                while (!isValidCard(drawnCard))
+                    drawnCard = draw();
+                if (players[whoseTurn].playGivenCard(drawnCard))
+                    play(drawnCard);
+            }
+            else if (res.toUpperCase().equals("DRAW"))
+                players[whoseTurn].addCard(draw());
+            else if (res.matches(Card.VALID_CARD_REGEX))
+                play(Card.parseCard(res));
         }
-        else if (res.toUpperCase().equals("DRAW"))
-            players[whoseTurn].addCard(draw());
-        else if (res.matches(Card.VALID_CARD_REGEX))
-            play(Card.parseCard(res));
     }
 
     /**
@@ -193,9 +206,13 @@ public class GameManager {
         }
         else {
             for (int i = 0; i < (byte) streak[1]; i++) {
+                if (!canStillDraw)
+                    break;
                 Card drawnCard = draw();
-                //System.out.printf("Drew %s\n", drawnCard.toString());
-                players[whoseTurn].addCard(drawnCard);
+                if (drawnCard != null) {
+                    System.out.printf("Drew %s\n", drawnCard.toString());
+                    players[whoseTurn].addCard(drawnCard);
+                }
             }
             streak[0] = false;
             streak[1] = (byte) 0;
@@ -225,12 +242,16 @@ public class GameManager {
 
     /**
      * This method draws a card from the deck. If the deck is empty and this method is called then a new deck will be
-     * created without the card that are in each player's hand and at play.
+     * created without the card that are in each player's hand and at play. If the deck is still empty then the game is
+     * essentially over.
      * @return <code>Card</code>: a card from the deck.
      */
     private Card draw() {
         newDeck();
-        return deck.draw();
+        Card drawnCard = deck.draw();
+        if (drawnCard == null)
+            canStillDraw = false;
+        return drawnCard;
     }
 
     private void setPlayedCard(Card card) {
@@ -241,6 +262,7 @@ public class GameManager {
 
     /**
      * @return <code>int</code>: a number indicating which player will be playing next.
+     * @apiNote while getNegDir seems useless now, its supposed to fix the reverse card issue.
      */
     private byte nextTurn(boolean getNegDir) {
         return (byte) ((whoseTurn + ((getNegDir != dirPos) ? 1 : -1) + players.length * 69) % players.length);
@@ -259,15 +281,15 @@ public class GameManager {
      * This method creates a new Uno deck, excluding cards in both player's hands.
      */
     private void newDeck() {
-        if (deck.size() == 0) {
+        if (deck.size() <= 0) {
             deck = new Deck();
 
             //removes cards from the deck that's already in player's hand & in play
             for (Player player : players)
                 for (Card card : player.getHand())
                     deck.removeCard(card);
-            deck.removeCard((Card)playedCard[0]);
-
+            if (deck.size() != 0)
+                deck.removeCard((Card)playedCard[0]);
             deck.shuffle(); //shuffles deck again.
         }
     }

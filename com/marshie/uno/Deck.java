@@ -4,6 +4,7 @@ import java.util.Stack;
 import java.util.Collections;
 
 public class Deck {
+    public final static int SIZE = 108;
     private final Stack<Card> deck;
 
     public Deck() {
@@ -33,7 +34,7 @@ public class Deck {
     }
 
     public Card draw() {
-        return deck.pop();
+        return deck.size() > 0 ? deck.pop() : null;
     }
 
     public void removeCard(Card card) {

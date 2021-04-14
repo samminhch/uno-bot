@@ -13,9 +13,10 @@ This is a code demonstrating the power of artificial intelligence and how it mas
 - [x] Fix bug where if a player uses a draw card and then draws again, they'll get 2 cards again.  
 - [x] Fix bug where if you don't have any playable cards and deny the first playable card drawn, it'll allow you to play any subsequently drawn card.  
 - [x] Fix bug where if you play a draw card the opponent doesn't actually draw cards.
-- [x] Fix bug where BufferedReader randomly crashes and breaks the game. ~~I still don't know how to fix that.~~ It was actually a scanner problem and I closed the scanner in the wild-card method.
-- [x] Implement a stacking mechanic (i.e: if Player 1 plays a draw2 card and Player 2 plays a draw2 card and Player 1 has
+- [x] Fix bug where BufferedReader randomly crashes and breaks the game. ~~I still don't know how to fix that.~~ It was actually a scanner problem, and I closed the scanner in the wild-card method.
+- [x] Added rule where if all players have a total of the number of cards in an Uno deck, the game ends, resulting in a tie.  
   no more draw2 cards, Player 1 draws 4 cards.)
+- [x] Implement a stacking mechanic (i.e: if Player 1 plays a draw2 card and Player 2 plays a draw2 card and Player 1 has
 - [x] FINISH THE REST OF THE DARN GAME (it's basically done, so I'm marking it as such)
 #### Not Urgent:
 - [ ] Fix skipping bug (no urgent, as it only applies to game where more than 2 people are playing, which isn't what we're training our AI to do atm.)
